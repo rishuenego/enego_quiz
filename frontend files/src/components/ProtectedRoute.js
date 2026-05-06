@@ -134,6 +134,7 @@ function ProtectedRoute({ children }) {
     } else {
       navigate("/login");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check route authorization when user data is available
@@ -146,6 +147,7 @@ function ProtectedRoute({ children }) {
       const isAdminRoute = currentPath.startsWith('/admin/');
       setAuthorized(!isAdminRoute);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const activeRoute = window.location.pathname;

@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { LanguageProvider } from "./i18n/LanguageContext";
 import "./stylesheets/theme.css";
 import "./stylesheets/alignments.css";

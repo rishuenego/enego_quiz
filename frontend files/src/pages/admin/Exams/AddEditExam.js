@@ -1,4 +1,4 @@
-import { Col, Form, message, Row, Select, Table } from "antd";
+import { Col, Form, message, Row, Table } from "antd";
 import React, { useEffect } from "react";
 import {
   addExam,
@@ -86,6 +86,7 @@ function AddEditExam() {
       getExamData();
     }
     loadAllExams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBulkUpload = async (e) => {

@@ -1,6 +1,6 @@
 import React from "react";
 import PageTitle from "../../../components/PageTitle";
-import { message, Table, Button } from "antd";
+import { message, Table } from "antd";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 import { getAllReports, getReportById } from "../../../apicalls/reports";
@@ -227,6 +227,7 @@ function AdminReports() {
 
   useEffect(() => {
     getData(filters, page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   return (

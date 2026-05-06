@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Col, Row, Empty, Tag, message, Tabs, Table, Button } from "antd";
+import { Col, Row, Empty, Tag, Tabs, Table, Button } from "antd";
 import PageTitle from "../../../components/PageTitle";
 import { getActiveSessions, getRecordedSessions } from "../../../apicalls/monitor";
 import RecordingPlayerModal from "./RecordingPlayerModal";
 import moment from "moment";
-import { PlayCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import { VideoCameraOutlined } from "@ant-design/icons";
 
 const { TabPane } = Tabs;
 const POLL_MS = 5000;

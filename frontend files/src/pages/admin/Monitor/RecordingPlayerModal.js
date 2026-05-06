@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Modal, Button, message, Spin } from "antd";
-import { CloseOutlined, PlayCircleOutlined } from "@ant-design/icons";
+import { Modal, Button, message } from "antd";
+import { PlayCircleOutlined } from "@ant-design/icons";
 import { getRecordings } from "../../../apicalls/monitor";
 
 function RecordingPlayerModal({ visible, setVisible, sessionData }) {

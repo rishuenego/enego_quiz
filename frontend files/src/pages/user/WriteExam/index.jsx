@@ -245,6 +245,7 @@ function WriteExam() {
       clearInterval(intervalId);
       message.warning(t("exam.timeUp"));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeUp]);
 
   useEffect(() => {
@@ -254,6 +255,7 @@ function WriteExam() {
     return () => {
       stopMedia();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleKick = async () => {
@@ -296,6 +298,7 @@ function WriteExam() {
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("blur", onBlur);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, intervalId]);
 
   // attach the camera stream to the preview video when entering questions
@@ -313,6 +316,7 @@ function WriteExam() {
       startSnapshotLoop();
       startRecording();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
   // start timing the current question; flush prior question's time

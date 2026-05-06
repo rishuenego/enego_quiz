@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Modal, Button, message, Spin } from "antd";
-import { CloseOutlined, PlayCircleOutlined, VideoCameraOutlined } from "@ant-design/icons";
+import { Modal, Button, message } from "antd";
+import { CloseOutlined, VideoCameraOutlined } from "@ant-design/icons";
 import { getRecordings } from "../../../apicalls/monitor";
 
 function UserAnswerReview({ visible, setVisible, reportData }) {
