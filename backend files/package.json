@@ -14,7 +14,8 @@
     "prod": "NODE_ENV=production node server.js",
     "bulk-insert-exam": "node bulkInsertExam.js",
     "bulk-insert": "node bulkInsert.js",
-    "test-db": "node test-db.js"
+    "test-db": "node test-db.js",
+    "make-admin": "node make_admin.js"
   },
   "author": "",
   "license": "ISC",
