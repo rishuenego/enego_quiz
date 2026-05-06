@@ -10,6 +10,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "echo 'Backend build complete - Node.js requires no compilation'",
+    "prod": "NODE_ENV=production node server.js",
     "bulk-insert-exam": "node bulkInsertExam.js",
     "bulk-insert": "node bulkInsert.js",
     "test-db": "node test-db.js"
