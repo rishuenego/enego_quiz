@@ -16,6 +16,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://quiz.enego.co.in",
+      "https://quiz.enego.in",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
