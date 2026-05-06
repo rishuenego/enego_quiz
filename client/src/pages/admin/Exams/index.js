@@ -9,21 +9,29 @@ import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 function Exams() {
   const navigate = useNavigate();
   const [exams, setExams] = React.useState([]);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const dispatch = useDispatch();
 
-  const getExamsData = async () => {
+  const getExamsData = async (currentPage = 1) => {
     try {
       dispatch(ShowLoading());
-      const response = await getAllExams();
+      const response = await getAllExams({
+        page: currentPage,
+        limit: 10,
+      });
       dispatch(HideLoading());
-      if (response.success) {
-        setExams(response.data);
+      if (response.success && response.data) {
+        setExams(response.data.exams || []);
+        setTotalCount(response.data.totalCount || 0);
       } else {
-        message.error(response.message);
+        message.error(response.message || "Something went wrong");
+        setExams([]);
       }
     } catch (error) {
       dispatch(HideLoading());
       message.error(error.message);
+      setExams([]);
     }
   };
 
@@ -36,7 +44,7 @@ function Exams() {
       dispatch(HideLoading());
       if (response.success) {
         message.success(response.message);
-        getExamsData();
+        getExamsData(page);
       } else {
         message.error(response.message);
       }
@@ -84,24 +92,33 @@ function Exams() {
     },
   ];
   useEffect(() => {
-    getExamsData();
-  }, []);
+    getExamsData(page);
+  }, [page]);
   return (
     <div>
       <div className="flex justify-between mt-2 items-end">
         <PageTitle title="Exams" />
 
         <button
-          className="primary-outlined-btn flex items-center"
+          className="add-exam-btn"
           onClick={() => navigate("/admin/exams/add")}
         >
-          <i className="ri-add-line"></i>
-          Add Exam
+          <i className="ri-add-circle-fill"></i>
+          <span>Add Exam</span>
         </button>
       </div>
       <div className="divider"></div>
 
-      <Table columns={columns} dataSource={exams} />
+      <Table
+        columns={columns}
+        dataSource={exams}
+        pagination={{
+          current: page,
+          total: totalCount,
+          pageSize: 10,
+          onChange: (p) => setPage(p),
+        }}
+      />
     </div>
   );
 }

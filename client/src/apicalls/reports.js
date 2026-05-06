@@ -1,4 +1,4 @@
-const { default: axiosInstance } = require(".");
+const { default: axiosInstance } = require("./index");
 
 // add report
 export const addReport = async (payload) => {
@@ -21,9 +21,19 @@ export const getAllReports = async (filters) => {
 } 
 
 // get all reports by user
-export const getAllReportsByUser = async () => {
+export const getAllReportsByUser = async (payload) => {
     try {
-        const response = await axiosInstance.post("/api/reports/get-all-reports-by-user");
+        const response = await axiosInstance.post("/api/reports/get-all-reports-by-user", payload);
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+// get report by id
+export const getReportById = async (payload) => {
+    try {
+        const response = await axiosInstance.post("/api/reports/get-report-by-id", payload);
         return response.data;
     } catch (error) {
         return error.response.data;

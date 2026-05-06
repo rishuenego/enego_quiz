@@ -1,33 +1,52 @@
 import { Button } from "antd";
+import { LanguageProvider } from "./i18n/LanguageContext";
 import "./stylesheets/theme.css";
 import "./stylesheets/alignments.css";
 import "./stylesheets/textelements.css";
 import "./stylesheets/custom-components.css";
 import "./stylesheets/form-elements.css";
 import "./stylesheets/layout.css";
+import "./stylesheets/mobile-responsive.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/common/Login";
-import Register from "./pages/common/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
+import Register from "./pages/common/Register";
 import Home from "./pages/common/Home";
 import Exams from "./pages/admin/Exams";
 import AddEditExam from "./pages/admin/Exams/AddEditExam";
+import Users from "./pages/admin/Users";
 import Loader from "./components/Loader";
 import { useSelector } from "react-redux";
 import WriteExam from "./pages/user/WriteExam";
 import UserReports from "./pages/user/UserReports";
 import AdminReports from "./pages/admin/AdminReports";
+import Monitor from "./pages/admin/Monitor";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
   return (
-    <>
+    <LanguageProvider>
       {loading && <Loader />}
       <BrowserRouter>
         <Routes>
           {/* Common Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
 
           {/* User Routes */}
           <Route
@@ -89,9 +108,27 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/monitor"
+            element={
+              <ProtectedRoute>
+                <Monitor />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
-    </>
+    </LanguageProvider>
   );
 }
 

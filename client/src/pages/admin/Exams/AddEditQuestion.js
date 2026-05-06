@@ -18,6 +18,7 @@ function AddEditQuestion({
       dispatch(ShowLoading());
       const requiredPayload = {
         name: values.name,
+        name_hi: values.name_hi,
         correctOption: values.correctOption,
         options: {
           A: values.A,
@@ -25,19 +26,24 @@ function AddEditQuestion({
           C: values.C,
           D: values.D,
         },
+        options_hi: {
+          A: values.A_hi,
+          B: values.B_hi,
+          C: values.C_hi,
+          D: values.D_hi,
+        },
         exam: examId,
       };
 
-      let response
-        if(selectedQuestion){
-            response = await editQuestionById({
-                ...requiredPayload,
-                questionId: selectedQuestion._id
-            })
-        }
-        else{
-            response = await addQuestionToExam(requiredPayload);
-        }
+      let response;
+      if (selectedQuestion) {
+        response = await editQuestionById({
+          ...requiredPayload,
+          questionId: selectedQuestion._id,
+        });
+      } else {
+        response = await addQuestionToExam(requiredPayload);
+      }
       if (response.success) {
         message.success(response.message);
         refreshData();
@@ -45,7 +51,7 @@ function AddEditQuestion({
       } else {
         message.error(response.message);
       }
-      setSelectedQuestion(null)
+      setSelectedQuestion(null);
       dispatch(HideLoading());
     } catch (error) {
       dispatch(HideLoading());
@@ -59,40 +65,69 @@ function AddEditQuestion({
       visible={showAddEditQuestionModal}
       footer={false}
       onCancel={() => {
-        setShowAddEditQuestionModal(false)
-        setSelectedQuestion(null)
+        setShowAddEditQuestionModal(false);
+        setSelectedQuestion(null);
       }}
+      width={800}
     >
-      <Form onFinish={onFinish} layout="vertical"
+      <Form
+        onFinish={onFinish}
+        layout="vertical"
         initialValues={{
-            name: selectedQuestion?.name,
-            A: selectedQuestion?.options?.A,
-            B: selectedQuestion?.options?.B,
-            C: selectedQuestion?.options?.C,
-            D: selectedQuestion?.options?.D,
-            correctOption: selectedQuestion?.correctOption,
+          name: selectedQuestion?.name,
+          name_hi: selectedQuestion?.name_hi,
+          A: selectedQuestion?.options?.A,
+          B: selectedQuestion?.options?.B,
+          C: selectedQuestion?.options?.C,
+          D: selectedQuestion?.options?.D,
+          A_hi: selectedQuestion?.options_hi?.A,
+          B_hi: selectedQuestion?.options_hi?.B,
+          C_hi: selectedQuestion?.options_hi?.C,
+          D_hi: selectedQuestion?.options_hi?.D,
+          correctOption: selectedQuestion?.correctOption,
         }}
       >
-        <Form.Item name="name" label="Question">
-          <input type="text" />
-        </Form.Item>
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item name="name" label="Question (English)">
+            <input type="text" />
+          </Form.Item>
+          <Form.Item name="name_hi" label="Question (Hindi/Hinglish)">
+            <input type="text" />
+          </Form.Item>
+        </div>
         <Form.Item name="correctOption" label="Correct Option">
           <input type="text" />
         </Form.Item>
 
-        <div className="flex gap-3">
-          <Form.Item name="A" label="Option A">
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item name="A" label="Option A (English)">
             <input type="text" />
           </Form.Item>
-          <Form.Item name="B" label="Option B">
+          <Form.Item name="A_hi" label="Option A (Hindi/Hinglish)">
             <input type="text" />
           </Form.Item>
         </div>
-        <div className="flex gap-3">
-          <Form.Item name="C" label="Option C">
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item name="B" label="Option B (English)">
             <input type="text" />
           </Form.Item>
-          <Form.Item name="D" label="Option D">
+          <Form.Item name="B_hi" label="Option B (Hindi/Hinglish)">
+            <input type="text" />
+          </Form.Item>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item name="C" label="Option C (English)">
+            <input type="text" />
+          </Form.Item>
+          <Form.Item name="C_hi" label="Option C (Hindi/Hinglish)">
+            <input type="text" />
+          </Form.Item>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Form.Item name="D" label="Option D (English)">
+            <input type="text" />
+          </Form.Item>
+          <Form.Item name="D_hi" label="Option D (Hindi/Hinglish)">
             <input type="text" />
           </Form.Item>
         </div>

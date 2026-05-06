@@ -14,6 +14,25 @@ const reportSchema = new mongoose.Schema(
       type: Object,
       required: true,
     },
+    questionTimings: {
+      type: Object,
+      default: {},
+    },
+    tabViolations: {
+      type: Number,
+      default: 0,
+    },
+    cameraGranted: {
+      type: Boolean,
+      default: false,
+    },
+    totalTime: {
+      type: Number,
+      default: 0,
+    },
+    sessionId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

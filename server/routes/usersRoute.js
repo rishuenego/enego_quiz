@@ -4,10 +4,18 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middlewares/authMiddleware");
 
-// user registration
+// user registration (admin only)
 
-router.post("/register", async (req, res) => {
+router.post("/register", authMiddleware, async (req, res) => {
   try {
+    // check if the current user is admin
+    const currentUser = await User.findById(req.body.userId);
+    if (!currentUser || !currentUser.isAdmin) {
+      return res
+        .status(403)
+        .send({ message: "Only admins can register new users", success: false });
+    }
+
     // check if user already exists
     const userExists = await User.findOne({ email: req.body.email });
     if (userExists) {
@@ -87,6 +95,29 @@ router.post("/get-user-info", authMiddleware, async (req, res) => {
       message: "User info fetched successfully",
       success: true,
       data: user,
+    });
+  } catch (error) {
+    console.error("Error in get-user-info:", error);
+    res.status(500).send({
+      message: error.message,
+      data: error,
+      success: false,
+    });
+  }
+});
+
+// get all users (admin only)
+router.get("/get-all-users", authMiddleware, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.body.userId);
+    if (!currentUser || !currentUser.isAdmin) {
+      return res.status(403).send({ message: "Access denied", success: false });
+    }
+    const users = await User.find({}).sort({ createdAt: -1 });
+    res.send({
+      message: "Users fetched successfully",
+      success: true,
+      data: users,
     });
   } catch (error) {
     res.status(500).send({

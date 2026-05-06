@@ -2,8 +2,10 @@ import { Col, Form, message, Row, Select, Table } from "antd";
 import React, { useEffect } from "react";
 import {
   addExam,
+  bulkUploadQuestions,
   deleteQuestionById,
   editExamById,
+  getAllExams,
   getExamById,
 } from "../../../apicalls/exams";
 import PageTitle from "../../../components/PageTitle";
@@ -22,7 +24,19 @@ function AddEditExam() {
   const [showAddEditQuestionModal, setShowAddEditQuestionModal] =
     React.useState(false);
   const [selectedQuestion, setSelectedQuestion] = React.useState(null);
+  const [allExams, setAllExams] = React.useState([]);
   const params = useParams();
+
+  const loadAllExams = async () => {
+    try {
+      const response = await getAllExams({ page: 1, limit: 200 });
+      if (response.success && response.data) {
+        setAllExams(response.data.exams || []);
+      }
+    } catch (e) {
+      // non-fatal
+    }
+  };
   const onFinish = async (values) => {
     try {
       dispatch(ShowLoading());
@@ -71,7 +85,33 @@ function AddEditExam() {
     if (params.id) {
       getExamData();
     }
+    loadAllExams();
   }, []);
+
+  const handleBulkUpload = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file || !params.id) return;
+    try {
+      const csvText = await file.text();
+      dispatch(ShowLoading());
+      const response = await bulkUploadQuestions({ examId: params.id, csvText });
+      dispatch(HideLoading());
+      if (response.success) {
+        message.success(response.message);
+        if (response.data && response.data.errors && response.data.errors.length) {
+          console.warn("Bulk upload errors:", response.data.errors);
+        }
+        getExamData();
+      } else {
+        message.error(response.message);
+      }
+    } catch (err) {
+      dispatch(HideLoading());
+      message.error(err.message);
+    } finally {
+      e.target.value = "";
+    }
+  };
 
   const deleteQuestion = async (questionId) => {
     try {
@@ -149,7 +189,17 @@ function AddEditExam() {
       <div className="divider"></div>
 
       {(examData || !params.id) && (
-        <Form layout="vertical" onFinish={onFinish} initialValues={examData}>
+        <Form
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={
+            examData || {
+              duration: 900,
+              totalMarks: 30,
+              passingMarks: 15,
+            }
+          }
+        >
           <Tabs defaultActiveKey="1">
             <TabPane tab="Exam Details" key="1">
               <Row gutter={[10, 10]}>
@@ -159,7 +209,10 @@ function AddEditExam() {
                   </Form.Item>
                 </Col>
                 <Col span={8}>
-                  <Form.Item label="Exam Duration" name="duration">
+                  <Form.Item
+                    label="Exam Duration (seconds — default 900 = 15 min)"
+                    name="duration"
+                  >
                     <input type="number" />
                   </Form.Item>
                 </Col>
@@ -188,6 +241,31 @@ function AddEditExam() {
                     <input type="number" />
                   </Form.Item>
                 </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Stage / Level (1, 2, 3...)"
+                    name="stage"
+                  >
+                    <input type="number" min={1} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    label="Prerequisite Exam (must pass this first)"
+                    name="prerequisiteExam"
+                  >
+                    <select>
+                      <option value="">None</option>
+                      {allExams
+                        .filter((e) => e._id !== params.id)
+                        .map((e) => (
+                          <option key={e._id} value={e._id}>
+                            {e.name}
+                          </option>
+                        ))}
+                    </select>
+                  </Form.Item>
+                </Col>
               </Row>
               <div className="flex justify-end gap-2">
                 <button
@@ -204,14 +282,28 @@ function AddEditExam() {
             </TabPane>
             {params.id && (
               <TabPane tab="Questions" key="2">
-                <div className="flex justify-end">
-                  <button
-                    className="primary-outlined-btn"
-                    type="button"
-                    onClick={() => setShowAddEditQuestionModal(true)}
-                  >
-                    Add Question
-                  </button>
+                <div className="flex justify-between" style={{ alignItems: "center" }}>
+                  <div style={{ fontSize: 12, color: "#666" }}>
+                    Bulk upload CSV columns: <code>name,correctOption,A,B,C,D</code>
+                  </div>
+                  <div className="flex gap-2">
+                    <label className="primary-outlined-btn" style={{ cursor: "pointer" }}>
+                      Bulk Upload CSV
+                      <input
+                        type="file"
+                        accept=".csv,text/csv"
+                        style={{ display: "none" }}
+                        onChange={handleBulkUpload}
+                      />
+                    </label>
+                    <button
+                      className="primary-outlined-btn"
+                      type="button"
+                      onClick={() => setShowAddEditQuestionModal(true)}
+                    >
+                      Add Question
+                    </button>
+                  </div>
                 </div>
 
                 <Table

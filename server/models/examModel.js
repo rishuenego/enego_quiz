@@ -27,6 +27,15 @@ const examSchema = new mongoose.Schema(
       ref: "questions",
       required: true,
     },
+    stage: {
+      type: Number,
+      default: 1,
+    },
+    prerequisiteExam: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "exams",
+      default: null,
+    },
   },
   {
     timestamps: true,

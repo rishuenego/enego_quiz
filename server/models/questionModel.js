@@ -5,6 +5,9 @@ const questionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  name_hi: {
+    type: String,
+  },
   correctOption: {
     type: String,
     required: true,
@@ -12,6 +15,9 @@ const questionSchema = new mongoose.Schema({
   options: {
     type: Object,
     required: true,
+  },
+  options_hi: {
+    type: Object,
   },
   exam: {
     type: mongoose.Schema.Types.ObjectId,

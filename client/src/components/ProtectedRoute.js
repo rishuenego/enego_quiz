@@ -5,11 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { SetUser } from "../redux/usersSlice.js";
 import { useNavigate } from "react-router-dom";
 import { HideLoading, ShowLoading } from "../redux/loaderSlice";
+import { LanguageSelect } from "../i18n/LanguageContext";
+import GoogleTranslate from "./GoogleTranslate";
 
 function ProtectedRoute({ children }) {
   const { user } = useSelector((state) => state.users);
   const [menu, setMenu] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [authorized, setAuthorized] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -57,17 +60,23 @@ function ProtectedRoute({ children }) {
       onClick: () => navigate("/admin/exams"),
     },
     {
+      title: "Users",
+      paths: ["/admin/users"],
+      icon: <i className="ri-user-line"></i>,
+      onClick: () => navigate("/admin/users"),
+    },
+    {
       title: "Reports",
       paths: ["/admin/reports"],
       icon: <i className="ri-bar-chart-line"></i>,
       onClick: () => navigate("/admin/reports"),
     },
-    // {
-    //   title: "Profile",
-    //   paths: ["/profile"],
-    //   icon: <i className="ri-user-line"></i>,
-    //   onClick: () => navigate("/profile"),
-    // },
+    {
+      title: "Live Monitor",
+      paths: ["/admin/monitor"],
+      icon: <i className="ri-eye-line"></i>,
+      onClick: () => navigate("/admin/monitor"),
+    },
     {
       title: "Logout",
       paths: ["/logout"],
@@ -91,6 +100,8 @@ function ProtectedRoute({ children }) {
         } else {
           setMenu(userMenu);
         }
+        // Check if user has permission to access current route
+        checkRouteAuthorization(response.data);
       } else {
         message.error(response.message);
       }
@@ -101,6 +112,22 @@ function ProtectedRoute({ children }) {
     }
   };
 
+  // Check route authorization
+  const checkRouteAuthorization = (userData) => {
+    const currentPath = window.location.pathname;
+    const isAdminRoute = currentPath.startsWith('/admin/');
+    const isUserAdmin = userData?.isAdmin;
+
+    if (isAdminRoute && !isUserAdmin) {
+      message.error("You don't have permission to access this page");
+      navigate("/");
+      setAuthorized(false);
+      return false;
+    }
+    setAuthorized(true);
+    return true;
+  };
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       getUserData();
@@ -108,6 +135,18 @@ function ProtectedRoute({ children }) {
       navigate("/login");
     }
   }, []);
+
+  // Check route authorization when user data is available
+  useEffect(() => {
+    if (user) {
+      checkRouteAuthorization(user);
+    } else {
+      // If no user data yet, allow rendering (will be checked after user loads)
+      const currentPath = window.location.pathname;
+      const isAdminRoute = currentPath.startsWith('/admin/');
+      setAuthorized(!isAdminRoute);
+    }
+  }, [user]);
 
   const activeRoute = window.location.pathname;
 
@@ -131,54 +170,88 @@ function ProtectedRoute({ children }) {
     return false;
   };
 
+  // Don't render if user is not authorized for this route
+  if (!authorized) {
+    return null;
+  }
+
   return (
-    <div className="layout">
-      <div className="flex gap-2 w-full h-full h-100">
-        <div className="sidebar">
-          <div className="menu">
-            {menu.map((item, index) => {
-              return (
-                <div
-                  className={`menu-item ${
-                    getIsActiveOrNot(item.paths) && "active-menu-item"
-                  }`}
-                  key={index}
-                  onClick={item.onClick}
-                >
-                  {item.icon}
-                  {!collapsed && <span>{item.title}</span>}
-                </div>
-              );
-            })}
+    <div className="enego-layout">
+      <div className="enego-shell">
+  
+        {/* SIDEBAR */}
+        <aside className={`enego-sidebar ${collapsed ? "collapsed" : ""}`}>
+          <div className="sidebar-logo">
+            <img src="/logo-obg.webp" alt="ENEGO" />
           </div>
-        </div>
-        <div className="body">
-          <div className="header flex justify-between">
-            {!collapsed && (
-              <i
-                className="ri-close-line"
-                onClick={() => setCollapsed(true)}
-              ></i>
-            )}
-            {collapsed && (
-              <i
-                className="ri-menu-line"
-                onClick={() => setCollapsed(false)}
-              ></i>
-            )}
-            <h1 className="text-2xl text-white">QUIZ Application</h1>
-            <div>
-              <div className="flex gap-1 items-center">
-                <h1 className="text-md text-white">{user?.name}</h1>
+  
+          <nav className="sidebar-menu">
+            {menu.map((item, index) => (
+              <div
+                key={index}
+                className={`sidebar-item ${
+                  getIsActiveOrNot(item.paths) ? "active" : ""
+                }`}
+                onClick={item.onClick}
+              >
+                {item.icon}
+                <span className="sidebar-text">{item.title}</span>
               </div>
-              <span>Role : {user?.isAdmin ? "Admin" : "User"}</span>
+            ))}
+
+            {/* COLLAPSE TOGGLE INSIDE SIDEBAR */}
+            <div className="sidebar-toggle-item" onClick={() => setCollapsed(!collapsed)}>
+              <i className={collapsed ? "ri-arrow-right-s-line" : "ri-arrow-left-s-line"}></i>
+              <span className="sidebar-text">Collapse Sidebar</span>
             </div>
-          </div>
-          <div className="content">{children}</div>
-        </div>
+          </nav>
+        </aside>
+  
+        {/* MAIN */}
+        <main className="enego-main">
+  
+          {/* HEADER */}
+          <header className="enego-header">
+            <div className="left flex items-center gap-2">
+               <div className="welcome-text">
+                 <p className="text-xs text-muted mb-0">Platform Access</p>
+                 <h2 className="text-lg" style={{ background: "none", WebkitTextFillColor: "initial", color: "var(--text-main)", fontSize: "18px" }}>
+                   {user?.isAdmin ? "Administrative Dashboard" : "Student Assessment Portal"}
+                 </h2>
+               </div>
+            </div>
+  
+            <div className="right flex items-center gap-4">
+              <div className="lang-wrapper">
+                <i className="ri-translate-2 mr-2 text-primary"></i>
+                <GoogleTranslate />
+                <LanguageSelect style={{ border: "none", outline: "none", background: "transparent", fontWeight: 600, color: "var(--text-main)", display: "none" }} />
+              </div>
+
+              <div className="user-chip-new" onClick={() => navigate("/user/reports")} style={{ cursor: "pointer" }}>
+                <div className="avatar-small">{user?.name?.[0]}</div>
+                <div className="user-info-mini">
+                  <span className="user-name">{user?.name}</span>
+                  <span className={`status-pill ${user?.isAdmin ? "admin" : "user"}`}>
+                    {user?.isAdmin ? "Admin" : "Student"}
+                  </span>
+                </div>
+                <i className="ri-arrow-down-s-line text-muted"></i>
+              </div>
+            </div>
+          </header>
+  
+          {/* CONTENT */}
+          <section className="enego-content">
+            {children}
+          </section>
+  
+        </main>
       </div>
     </div>
   );
+  
+  
 }
 
 export default ProtectedRoute;
